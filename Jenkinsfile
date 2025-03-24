@@ -42,4 +42,9 @@ agent any
         }
         
     }
+    post {
+     always{
+         junit 'test-results/junit.xml'
+     }   
+    }
 }
