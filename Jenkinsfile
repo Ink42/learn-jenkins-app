@@ -1,7 +1,8 @@
 pipeline {
     environment{
         NETLIFT_SITE_ID='b3f377f8-434c-4e74-8b5b-314f60fe616f' //LOL don't even try it , i'll be changing it once done 
-    }
+   NETLIFT_SITE_TOKEN= credentials('netlify-token')
+   }
     
 agent any
     stages {
