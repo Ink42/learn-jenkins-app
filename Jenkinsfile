@@ -1,73 +1,69 @@
 pipeline {
-    environment{
-        NETLIFT_SITE_ID='b3f377f8-434c-4e74-8b5b-314f60fe616f' //oh no 
-   NETLIFT_SITE_TOKEN= credentials('netlify-token')
-   }
+    environment {
+        NETLIFT_SITE_ID = 'b3f377f8-434c-4e74-8b5b-314f60fe616f'
+        NETLIFT_SITE_TOKEN = credentials('netlify-token')
+    }
     
-agent any
+    agent any
+    
     stages {
-    
-        stage('build') {
-            
-            agent{
-                docker{
+        stage('Build') {
+            agent {
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
             steps {
                 sh '''
-                ls -la
-                node --version
-                npm --version
-                npm ci
-                npm run build
-                ls -la
-
-                
+                    ls -la
+                    node --version
+                    npm --version
+                    npm ci
+                    npm run build
+                    ls -la build/
                 '''
             }
         }
 
-           stage('Test'){
-                   agent{
-                docker{
+        stage('Test') {
+            agent {
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
             steps {
                 sh '''
-                test -f build/index.html
-                npm test
-                
-                '''
-            }
-        }
-                   stage('Depoly') {
-            
-            agent{
-                docker{
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-              npm install netlify-cli 
-              node_modules/.bin/netlify --version
-              node_modules/.bin/netlify status
-              node_modules/.bin/netlify deploy --dir=build --prod                
+                    test -f build/index.html
+                    npm test
                 '''
             }
         }
         
+        stage('Deploy') {  
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            environment {
+                NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+            }
+            steps {
+                sh '''
+                    npm install -g netlify-cli
+                    netlify --version
+                    netlify deploy --dir=build --prod
+                '''
+            }
+        }
     }
-
- 
+    
     post {
-     always{
-         junit 'test-results/junit.xml'
-     }   
+        always {
+            junit 'test-results/junit.xml'
+        }
     }
 }
