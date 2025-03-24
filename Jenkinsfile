@@ -2,6 +2,13 @@ pipeline {
     
 agent any
     stages {
+               steps {
+                sh '''
+                test -f build/index.html
+                
+                '''
+            }
+        }
         stage('build') {
             
             agent{
