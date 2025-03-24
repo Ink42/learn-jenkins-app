@@ -40,10 +40,7 @@ agent any
                 '''
             }
         }
-        
-    }
-
-            stage('Depoly') {
+                   stage('Depoly') {
             
             agent{
                 docker{
@@ -60,6 +57,10 @@ agent any
                 '''
             }
         }
+        
+    }
+
+ 
     post {
      always{
          junit 'test-results/junit.xml'
